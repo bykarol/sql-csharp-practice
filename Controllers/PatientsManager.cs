@@ -1,10 +1,13 @@
-namespace sql_csharp_practice
+using sql_csharp_practice.Services;
+using sql_csharp_practice.Models;
+namespace sql_csharp_practice.Controllers
 {
   class PatientsManager
   {
     // List of patients
-    public static List<Patient> patients { get; set; } = Database.GetPatients();
+    public static List<Patient> patients { get; set; } = new List<Patient>();
     AppointmentsManager appointmentsManager = new AppointmentsManager(patients);
+
     public static void PatientsManagerMenu()
     {
       Console.WriteLine("\nPATIENTS MENU:");
@@ -83,7 +86,7 @@ namespace sql_csharp_practice
         // Creating a new patient
         Patient newPatient = new Patient(firstName, lastName, dateOfBirth, gender, address, phoneNumber);
         // Adding the new patient to database
-        Database.AddPatient(newPatient);
+        DatabaseService.AddPatient(newPatient);
         // Message to the user
         Console.WriteLine("Patient registered successfully!");
       }
@@ -92,6 +95,7 @@ namespace sql_csharp_practice
         Console.WriteLine($"Error: {ex.Message}");
       }
     }
+
     public static void AddMedicalRecord()
     {
       try
@@ -112,7 +116,7 @@ namespace sql_csharp_practice
         }
         // Adding MedicalRecord to the database
         MedicalHistory medicalHistory = new MedicalHistory(description);
-        Database.AddMedicalRecord(patient.ID, medicalHistory);
+        DatabaseService.AddMedicalRecord(patient.Id, medicalHistory);
         Console.WriteLine("Medical record added successfully!");
       }
       catch (Exception ex)
@@ -120,6 +124,7 @@ namespace sql_csharp_practice
         Console.WriteLine($"Error: {ex.Message}");
       }
     }
+
     public static void DisplayPatientInformation()
     {
       try
@@ -155,7 +160,7 @@ namespace sql_csharp_practice
         }
         // update the patient in the database
         Patient newPatient = newPatientInfo(patient);
-        Database.UpdatePatient(newPatient.ID, newPatient.FirstName, newPatient.LastName, newPatient.DateOfBirth, newPatient.Gender, newPatient.Address, newPatient.PhoneNumber);
+        DatabaseService.UpdatePatient(newPatient.Id, newPatient.FirstName, newPatient.LastName, newPatient.DateOfBirth, newPatient.Gender, newPatient.Address, newPatient.PhoneNumber);
 
         // show userfriendly message
         Console.WriteLine("Patient's data was succesfully updated!");
@@ -185,11 +190,13 @@ namespace sql_csharp_practice
         Console.WriteLine($"Error: {ex.Message}");
       }
     }
-    // TODO DISPLAY PATIENT LIST
+
     public static void DisplayPatientList()
     {
       try
       {
+        patients = DatabaseService.GetPatients() ?? new List<Patient>();
+
         if (patients.Count == 0)
         {
           Console.WriteLine("No patients found");
@@ -200,18 +207,17 @@ namespace sql_csharp_practice
         int counter = 1;
         foreach (Patient patient in patients)
         {
-          Console.WriteLine($"#{counter}");
-          patient?.DisplayInformation();
+          Console.WriteLine($"ID {patient.Id} - {patient.LastName} {patient.FirstName} - {patient.Gender} ");
           Console.WriteLine("******************************");
           counter++;
         }
+        Console.WriteLine($"{counter} patients");
       }
       catch (Exception ex)
       {
         Console.WriteLine($"Error: {ex.Message}");
       }
     }
-
 
     // ADITIONAL METHODS (HELPERS)
     // Function to update patient's data
@@ -292,7 +298,7 @@ namespace sql_csharp_practice
         Console.WriteLine("Invalid input. Please enter a valid patient ID:");
       }
       // Look for the patient in the database
-      Patient? patient = Database.GetPatientById(patientId);
+      Patient? patient = DatabaseService.GetPatientById(patientId);
 
       // Display the patient data
       if (patient == null)

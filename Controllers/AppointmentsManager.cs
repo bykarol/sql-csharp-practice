@@ -1,4 +1,6 @@
-namespace sql_csharp_practice
+using sql_csharp_practice.Services;
+using sql_csharp_practice.Models;
+namespace sql_csharp_practice.Controllers
 {
   class AppointmentsManager
   {

@@ -1,6 +1,4 @@
-using System.Data.Common;
-
-namespace sql_csharp_practice
+namespace sql_csharp_practice.Models
 {
   public class Patient : Person // Inherit from the abstract class Person
   {
@@ -10,8 +8,13 @@ namespace sql_csharp_practice
         : base(firstName, lastName, dateOfBirth, gender, address, phoneNumber)
     {
       History = new List<MedicalHistory>(); // empty list
-      // Appointments = new List<Appointment>();
     }
+    // Parameterless constructor to use with Dapper
+    public Patient()
+    {
+      History = new List<MedicalHistory>(); // empty list
+    }
+
 
     public override void DisplayInformation()
     {

@@ -1,9 +1,13 @@
-﻿namespace sql_csharp_practice
+﻿using sql_csharp_practice.Controllers;
+using sql_csharp_practice.Services.Data;
+namespace sql_csharp_practice
 {
     class Program
     {
         static void Main(string[] args)
         {
+            // Initizializing the database
+            DatabaseInitializer.InitializeDatabase();
             Console.WriteLine("#######################################################");
             Console.WriteLine("Welcome to the Appointment Management System (AMS)!");
             Console.WriteLine("Efficiently Streamlining Clinic Operations.");

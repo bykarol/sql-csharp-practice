@@ -1,6 +1,4 @@
-using System.Data.Common;
-
-namespace sql_csharp_practice
+namespace sql_csharp_practice.Models
 {
   public enum Gender
   {
@@ -9,17 +7,19 @@ namespace sql_csharp_practice
   }
   public abstract class Person
   {
-    public static int nextId = 1; public string FirstName { get; set; }
-    public int ID { get; set; }
+    public static int nextId = 1;
+    public int Id { get; set; }
+    public string FirstName { get; set; }
     public string LastName { get; set; }
     public DateTime DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public string Address { get; set; }
     public string PhoneNumber { get; set; }
 
-    public Person(string firstName, string lastName, DateTime dateOfBirth, Gender gender, string address, string phoneNumber)
+    public Person() { }
+    protected Person(string firstName, string lastName, DateTime dateOfBirth, Gender gender, string address, string phoneNumber)
     {
-      ID = GetNextId();
+      Id = GetNextId();
       FirstName = firstName;
       LastName = lastName;
       DateOfBirth = dateOfBirth;

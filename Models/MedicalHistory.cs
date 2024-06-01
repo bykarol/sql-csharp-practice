@@ -1,4 +1,4 @@
-namespace sql_csharp_practice
+namespace sql_csharp_practice.Models
 {
   public class MedicalHistory
   {
