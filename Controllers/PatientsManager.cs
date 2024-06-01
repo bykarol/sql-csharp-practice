@@ -181,8 +181,8 @@ namespace sql_csharp_practice.Controllers
         {
           return;
         }
-        // Delete the patient from patients list
-        patients.Remove(patientToDelete);
+        // Delete the patient from the database
+        DatabaseService.DeletePatient(patientToDelete.Id);
         Console.WriteLine($"Patient {patientToDelete.FirstName} {patientToDelete.LastName} was successfully deleted.");
       }
       catch (Exception ex)

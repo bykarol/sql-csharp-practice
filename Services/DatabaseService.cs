@@ -50,6 +50,102 @@ namespace sql_csharp_practice.Services
       }
     }
 
+    public static void UpdatePatient(int patientId, string firstName, string lastName, DateTime dateOfBirth, Gender gender, string address, string phoneNumber)
+    {
+      using (var connection = new SQLiteConnection(ConnectionString))
+      {
+        var sql = @"UPDATE patients
+                    SET FirstName = @FirstName,
+                        LastName = @LastName,
+                        DateOfBirth = @DateOfBirth,
+                        Gender = @Gender,
+                        Address = @Address,
+                        PhoneNumber = @PhoneNumber
+                    WHERE Id = @Id";
+
+        var parameters = new
+        {
+          patientId,
+          firstName,
+          lastName,
+          dateOfBirth,
+          gender,
+          address,
+          phoneNumber
+        };
+
+        connection.Execute(sql, parameters);
+      }
+    }
+
+    public static void AddMedicalRecord(int patientId, MedicalHistory history)
+    {
+      using (var connection = new SQLiteConnection(ConnectionString))
+      {
+        connection.Open();
+        var sql = @"INSERT INTO medicalHistory (PatientId, Description)
+                            VALUES (@PatientId, @Description)";
+        connection.Execute(sql, new { PatientId = patientId, history.Description });
+      }
+    }
+
+    public static void DeletePatient(int patientId)
+    {
+      using (var connection = new SQLiteConnection(ConnectionString))
+      {
+        connection.Open();
+
+        using (var transaction = connection.BeginTransaction())
+        {
+          try
+          {
+            // Delete medical history records associated with the patient if they exist
+            var deleteMedicalHistorySql = @"DELETE FROM medicalHistory WHERE PatientId = @PatientId";
+            var medicalHistoryDeleted = connection.Execute(deleteMedicalHistorySql, new { PatientId = patientId }, transaction);
+
+            if (medicalHistoryDeleted > 0)
+            {
+              Console.WriteLine($"Deleted {medicalHistoryDeleted} medical history records for patient ID {patientId}.");
+            }
+
+            // Delete appointments associated with the patient if they exist
+            var deleteAppointmentsSql = @"DELETE FROM appointments WHERE PatientId = @PatientId";
+            var appointmentsDeleted = connection.Execute(deleteAppointmentsSql, new { PatientId = patientId }, transaction);
+
+            if (appointmentsDeleted > 0)
+            {
+              Console.WriteLine($"Deleted {appointmentsDeleted} appointments for patient ID {patientId}.");
+            }
+
+            // Delete the patient
+            var deletePatientSql = @"DELETE FROM patients WHERE Id = @PatientId";
+            var patientDeleted = connection.Execute(deletePatientSql, new { PatientId = patientId }, transaction);
+
+            if (patientDeleted > 0)
+            {
+              Console.WriteLine($"Deleted patient ID {patientId}.");
+            }
+            else
+            {
+              Console.WriteLine($"No patient found with ID {patientId}.");
+            }
+
+            // Commit the transaction
+            transaction.Commit();
+          }
+          catch (Exception ex)
+          {
+            // Rollback the transaction if any command fails
+            transaction.Rollback();
+            Console.WriteLine($"Error occurred while deleting patient: {ex.Message}");
+            throw;
+          }
+        }
+      }
+    }
+
+
+    // CRUD OPERATIONS FOR APPOINMENTS
     public static void AddAppointment(Appointment appointment)
     {
       using (var connection = new SQLiteConnection(ConnectionString))
@@ -84,44 +180,6 @@ namespace sql_csharp_practice.Services
       }
     }
 
-    public static void AddMedicalRecord(int patientId, MedicalHistory history)
-    {
-      using (var connection = new SQLiteConnection(ConnectionString))
-      {
-        connection.Open();
-        var sql = @"INSERT INTO medicalHistory (PatientId, Description)
-                            VALUES (@PatientId, @Description)";
-        connection.Execute(sql, new { PatientId = patientId, history.Description });
-      }
-    }
-
-    public static void UpdatePatient(int patientId, string firstName, string lastName, DateTime dateOfBirth, Gender gender, string address, string phoneNumber)
-    {
-      using (var connection = new SQLiteConnection(ConnectionString))
-      {
-        var sql = @"UPDATE patients
-                    SET FirstName = @FirstName,
-                        LastName = @LastName,
-                        DateOfBirth = @DateOfBirth,
-                        Gender = @Gender,
-                        Address = @Address,
-                        PhoneNumber = @PhoneNumber
-                    WHERE Id = @Id";
-
-        var parameters = new
-        {
-          patientId,
-          firstName,
-          lastName,
-          dateOfBirth,
-          gender,
-          address,
-          phoneNumber
-        };
-
-        connection.Execute(sql, parameters);
-      }
-    }
 
     // HELPERS
     private static List<MedicalHistory> GetMedicalHistoryForPatient(int patientId)
