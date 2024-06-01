@@ -115,8 +115,9 @@ namespace sql_csharp_practice.Controllers
           throw new ArgumentException("Description cannot be empty.");
         }
         // Adding MedicalRecord to the database
-        MedicalHistory medicalHistory = new MedicalHistory(description);
-        DatabaseService.AddMedicalRecord(patient.Id, medicalHistory);
+        DateTime date = DateTime.Now;
+        MedicalHistory medicalHistory = new MedicalHistory(patient.Id, description, date);
+        DatabaseService.AddMedicalRecord(medicalHistory);
         Console.WriteLine("Medical record added successfully!");
       }
       catch (Exception ex)
@@ -160,7 +161,7 @@ namespace sql_csharp_practice.Controllers
         }
         // update the patient in the database
         Patient newPatient = newPatientInfo(patient);
-        DatabaseService.UpdatePatient(newPatient.Id, newPatient.FirstName, newPatient.LastName, newPatient.DateOfBirth, newPatient.Gender, newPatient.Address, newPatient.PhoneNumber);
+        DatabaseService.UpdatePatient(patient);
 
         // show userfriendly message
         Console.WriteLine("Patient's data was succesfully updated!");

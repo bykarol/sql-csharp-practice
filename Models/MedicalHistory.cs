@@ -2,15 +2,19 @@ namespace sql_csharp_practice.Models
 {
   public class MedicalHistory
   {
-    public DateTime Date { get; }
-    public string Description { get; }
-    // public Doctor Doctor { get; }
+    public DateTime Date { get; set; }
+    public string Description { get; set; }
+    public int PatientId { get; set; }
 
-    public MedicalHistory(string description)
+    public MedicalHistory(int patientId, string description, DateTime date)
     {
-      Date = DateTime.Now;
+      Date = date;
       Description = description;
+      PatientId = patientId;
     }
+
+    public MedicalHistory()
+    { }
 
     public void DisplayMedicalHistoryInfo()
     {

@@ -50,7 +50,7 @@ namespace sql_csharp_practice.Services
       }
     }
 
-    public static void UpdatePatient(int patientId, string firstName, string lastName, DateTime dateOfBirth, Gender gender, string address, string phoneNumber)
+    public static void UpdatePatient(Patient patient)
     {
       using (var connection = new SQLiteConnection(ConnectionString))
       {
@@ -63,29 +63,17 @@ namespace sql_csharp_practice.Services
                         PhoneNumber = @PhoneNumber
                     WHERE Id = @Id";
 
-        var parameters = new
-        {
-          patientId,
-          firstName,
-          lastName,
-          dateOfBirth,
-          gender,
-          address,
-          phoneNumber
-        };
-
-        connection.Execute(sql, parameters);
+        connection.Execute(sql, patient);
       }
     }
 
-    public static void AddMedicalRecord(int patientId, MedicalHistory history)
+    public static void AddMedicalRecord(MedicalHistory history)
     {
       using (var connection = new SQLiteConnection(ConnectionString))
       {
-        connection.Open();
-        var sql = @"INSERT INTO medicalHistory (PatientId, Description)
-                            VALUES (@PatientId, @Description)";
-        connection.Execute(sql, new { PatientId = patientId, history.Description });
+        var sql = @"INSERT INTO medicalHistory (PatientId, Description, Date)
+                            VALUES (@PatientId, @Description, @Date)";
+        connection.Execute(sql, history);
       }
     }
 
@@ -186,7 +174,7 @@ namespace sql_csharp_practice.Services
     {
       using (var connection = new SQLiteConnection(ConnectionString))
       {
-        var medicalHistory = connection.Query<MedicalHistory>("SELECT Description FROM medicalHistory WHERE PatientId = @PatientId", new { PatientId = patientId }).ToList();
+        var medicalHistory = connection.Query<MedicalHistory>("SELECT * FROM medicalHistory WHERE PatientId = @PatientId", new { PatientId = patientId }).ToList();
 
         if (medicalHistory.Count == 0)
         {
